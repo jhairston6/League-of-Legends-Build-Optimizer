@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script type="text/JavaScript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+   <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+  background: url('https://vignette.wikia.nocookie.net/leagueoflegends/images/5/53/Summoner%27s_Rift_Update_Map.png/revision/latest?cb=20170223053555'); background-repeat:no-repeat;
+  background-attachment: fixed;
+  background-size: 100% 100%;
+  overflow: hidden;
+}
+
+td, th {
+  border: 1px solid # 000000;
+  padding: 8px;
+  color: #ffcd00;
+  z-index: 30;
+  font-family: fantasy;
+  text-align: center;
+  font-size: 17px;
+  margin-left: auto;
+  margin-right: auto;
+
+
+}
+
+tr {
+  margin-left: 20%;
+  margin-right: 20%
+}
+
+tr:hover {background-color: black;}
+
+#overlay {
+  position: fixed;
+  display: none;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+  z-index: -1;
+
+  cursor: pointer; /* Add a pointer on hover */
+}
+
+
+a.top {
+  position: absolute;
+  left: 0%;
+  top: 19%;
+  width: 47%;
+  text-align: center;
+  font-size: 30px;
+  color: #ffdc00;
+  font-weight: bold;
+  text-shadow: 1.5px 1.5px #ff8300;
+  font-family: fantasy;
+}
+a.top:hover {
+  transform: scale(2.0);
+}
+a.mid {
+  position: absolute;
+  left: 0%;
+  top: 48%;
+  width: 100%;
+  text-align: center;
+  font-size: 30px;
+  color:#ffdc00	;
+  font-weight: bold;
+  text-shadow: 1.5px 1.5px #ff8300;
+  font-family: fantasy;
+}
+a.mid:hover {
+  transform: scale(2.0);
+}
+a.bot {
+  position: absolute;
+  bottom: 17%;
+  right: 20%;
+  font-size: 30px;
+  color:#ffdc00	;
+  font-weight: bold;
+  text-shadow: 1.5px 1.5px #ff8300;
+  font-family: fantasy;
+}
+a.bot:hover {
+  transform: scale(2.0);
+}
+a.jungle {
+  position: absolute;
+  bottom: 30%;
+  right: 45%;
+  font-size: 30px;
+  color:#ffdc00	;
+  font-weight: bold;
+  text-shadow: 1.5px 1.5px #ff8300;
+  font-family: fantasy;
+}
+a.jungle:hover {
+  transform: scale(2.0);
+}
+/*the container must be positioned relative:*/
+.custom-select {
+  position: relative;
+  font-family: Arial;
+}
+.custom-select select {
+  display: none; /*hide original SELECT element:*/
+}
+.select-selected {
+  background-color: #ffdc00;
+}
+/*style the arrow inside the select element:*/
+.select-selected:after {
+  position: absolute;
+  content: "";
+  top: 14px;
+  right: 10px;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-color: #fff transparent transparent transparent;
+}
+/*point the arrow upwards when the select box is open (active):*/
+.select-selected.select-arrow-active:after {
+  border-color: transparent transparent #fff transparent;
+  top: 7px;
+}
+/*style the items (options), including the selected item:*/
+.select-items div,.select-selected {
+  color: #ffffff;
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
+  cursor: pointer;
+  user-select: none;
+}
+/*style items (options):*/
+.select-items {
+  position: absolute;
+  background-color: #ffdc00;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 99;
+}
+/*hide the items when the select box is closed:*/
+.select-hide {
+  display: none;
+}
+.select-items div:hover, .same-as-selected {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+
+</style>
+</head>
+<body>
+
+  <div>
+    <a class="top" id='T'onclick="run('T')">TOP</a>
+    <a class="mid" id='M'onclick="run('M')">MID</a>
+    <a class="bot" id='B'onclick="run('B')">BOT</a>
+    <a class="jungle" id='J'onclick="run('J')">JUNGLE</a>
+    <div class="custom-select" style="width:150px;">
+
+  </div>
+  <button id="filter" name="filter" onclick="window.location.reload();">Reset</button>
+
+</div>
+<div id="overlay"></div>
+
+<script>
+
+
+function blurscreen() {
+  $('a').remove()
+  $('select').remove()
+
+  }
+
+function run(x) {
+  blurscreen()
+  update(x)
+
+}
+
+function on() {
+  document.getElementById("overlay").style.display = "block";
+}
+
+function off() {
+  document.getElementById("overlay").style.display = "none";
+}
+
+
+
+
+
+
+var backup = {"BP":[{"rank": 1, "item6": "Zeal", "item4": "Nexus Siege: Siege Weapon Slot", "item2": "Blasting Wand", "item5": "Maw of Malmortius", "trinket": "Greater Stealth Totem", "item3": "Nomads Medallion", "item1": "Rabadons Deathcap", "Champion": "Orianna"}, {"item4": "Infinity Edge", "rank": 2, "item6": "Phantom Dancer", "item3": "Null-Magic Mantle", "item2": "Thornmail", "item5": "Eye of the Watchers", "trinket": "None", "item1": "Runaans Hurricane", "Champion": "Corki"}, {"trinket": "None", "item6": "Enchantment: Cinderhulk", "item4": "Seraphs Embrace", "item2": "Rabadons Deathcap", "item5": "Seraphs Embrace", "item3": "Sheen", "rank": 3, "item1": "Muramana", "Champion": "Draven"}, {"trinket": "None", "item6": "Hunters Talisman", "item4": "Muramana", "item2": "Spirit Visage", "item5": "Dagger", "item3": "Enchantment: Bloodrazor", "rank": 4, "item1": "Soul Anchor", "Champion": "Hecarim"}]
+,"TP":[{"rank": 1, "item6": "Frozen Heart", "item4": "Eye of the Watchers", "item5": "Lost Chapter", "item2": "Jaurims Fist", "Champion": "Malzahar", "item3": "Zhonyas Hourglass", "item1": "Enchantment: Cinderhulk", "trinket": "None"}, {"rank": 2, "item6": "Giants Belt", "item4": "Nashors Tooth", "item5": "Vanguard Banner", "item2": "Mikaels Crucible", "Champion": "Kayn", "item3": "Poro-Snax", "item1": "Hextech GLP-800", "trinket": "None"}]
+,"MP":[{"item6": "Control Ward", "item1": "Enchantment: Cinderhulk", "item2": "Void Staff", "item3": "Hextech Revolver", "rank": 1, "trinket": "None", "item5": "Aether Wisp", "Champion": "KhaZix", "item4": "Spectres Cowl"}, {"item6": "Boots of Speed", "Champion": "DrMundo", "item2": "Mikaels Crucible", "item3": "Deaths Daughter", "rank": 2, "trinket": "Greater Stealth Totem", "item5": "Morellonomicon", "item1": "Dervish Blade", "item4": "Knights Vow"}, {"item6": "Bilgewater Cutlass", "item1": "Rainbow Snax Party Pack!", "item2": "Chalice of Harmony", "item3": "Pickaxe", "rank": 3, "trinket": "None", "item5": "Greater Vision Totem", "Champion": "Kayn", "item4": "Elixir of Sorcery"}]
+,"JP":[{"item6": "Health Potion", "item2": "Lich Bane", "item5": "Manamune", "item1": "Ninja Tabi", "Champion": "Master Yi", "rank": 1, "item3": "Locket of the Iron Solari", "item4": "Pickaxe", "trinket": "None"}, {"item5": "Rejuvenation Bead", "item6": "Catalyst of Aeons", "item2": "Ruby Sightstone", "item1": "Mejais Soulstealer", "Champion": "Master Yi", "rank": 2, "item3": "Cloak of Agility", "item4": "Guardians Horn", "trinket": "None"}, {"item6": "Mercurial Scimitar", "item2": "B. F. Sword", "item5": "Dorans Blade", "trinket": "None", "Champion": "Gnar", "rank": 3, "item3": "Stalkers Blade", "item4": "Runaans Hurricane", "item1": "Chain Vest"}]
+,"BQ":[{"Champion": "Pantheon", "trinket": "Warding Totem", "item3": "The Black Cleaver", "item2": "Catalyst of Aeons", "item5": "Zeal", "rank": 1, "item4": "Ravenous Hydra", "item6": "Frost Queens Claim", "item1": "The Bloodthirster"}, {"Champion": "Hecarim", "trinket": "Greater Vision Totem", "item3": "Ohmwrecker", "item2": "Nashors Tooth", "item5": "Mikaels Crucible", "rank": 2, "item4": "Rod of Ages", "item6": "Wits End", "item1": "Muramana"}, {"Champion": "Poppy", "trinket": "Sweeping Lens", "item3": "Wicked Hatchet", "item2": "Infinity Edge", "item5": "Greater Stealth Totem", "rank": 3, "item4": "The Black Cleaver", "item6": "Arcane Sweeper", "item1": "The Hex Core mk-2"}]
+,"TQ":[{"trinket": "None", "Champion": "Janna", "item6": "Guardian Angel", "item5": "Mejais Soulstealer", "item4": "Enchantment: Runic Echoes", "item1": "Skirmishers Sabre", "item2": "Raptor Cloak", "item3": "The Dark Seal", "rank": 1}, {"Champion": "Twitch", "trinket": "None", "item6": "Steraks Gage", "item5": "Vanguard Banner", "item1": "Health Potion", "item4": "Eye of the Oasis", "item2": "Arcane Sweeper", "item3": "Vanguard Banner", "rank": 2}, {"Champion": "KhaZix", "trinket": "None", "item2": "Essence Reaver", "item5": "Sunfire Cape", "item1": "Rod of Ages", "item4": "Flash Zone", "item6": "Ancient Coin", "item3": "Poachers Dirk", "rank": 3}, {"Champion": "DrMundo", "trinket": "Farsight Alteration", "item6": "Locket of the Iron Solari", "item5": "Port Pad", "item1": "Dorans Blade", "item4": "Morellonomicon", "item2": "Trackers Knife", "item3": "Farsight Alteration", "rank": 4}]
+,"MQ":[{"item3": "Nomads Medallion", "trinket": "None", "item6": "Mortal Reminder", "item4": "Siege Teleport Inactive", "rank": 1, "item1": "Warmogs Armor", "Champion": "Ryze", "item2": "Hextech GLP-800", "item5": "Banner of Command"}, {"item3": "Haunting Guise", "trinket": "None", "item6": "Seekers Armguard", "item4": "Enchantment: Cinderhulk", "rank": 2, "item1": "Trackers Knife", "Champion": "Lee Sin", "item2": "Flash Zone", "item5": "Deaths Daughter"}, {"item3": "Jaurims Fist", "trinket": "Sweeping Lens", "item6": "Null-Magic Mantle", "Champion": "Gnar", "rank": 3, "item4": "Enchantment: Cinderhulk", "item1": "Enchantment: Runic Echoes", "item2": "Stalkers Blade", "item5": "Bilgewater Cutlass"}, {"item3": "Golden Transcendence Disabled", "trinket": "Sweeping Lens", "item6": "Mercurys Treads", "Champion": "Ahri", "rank": 4, "item4": "Dead Mans Plate", "item1": "Kircheis Shard", "item2": "Steraks Gage", "item5": "Fiendish Codex"}]
+,"JQ":[{"item1": "Enchantment: Warrior", "item3": "Ardent Censer", "Champion": "Master Yi", "item4": "Trinity Force", "item6": "Wardens Mail", "item2": "Elixir of Wrath", "rank": 1, "trinket": "Greater Vision Totem", "item5": "Rylais Crystal Scepter"}, {"item1": "Enchantment: Cinderhulk", "item2": "Deaths Dance", "Champion": "Kayle", "item4": "Enchantment: Runic Echoes", "item6": "Lich Bane", "item3": "Hunters Machete", "rank": 2, "trinket": "None", "item5": "Tear of the Goddess"}, {"item1": "Void Staff", "item2": "Refillable Potion", "Champion": "Kayle", "item4": "Guardian Angel", "item6": "Ohmwrecker", "item3": "Guinsoos Rageblade", "rank": 3, "trinket": "None", "item5": "Wardens Mail"}, {"item1": "B. F. Sword", "item3": "Bamis Cinder", "Champion": "Master Yi", "item4": "Hextech Gunblade", "item6": "Rejuvenation Bead", "item2": "Executioners Calling", "rank": 4, "trinket": "Sweeping Lens", "item5": "Warmogs Armor"}]}
+
+var dataset = {"BP":[{"Rank": 1, "item6": "Zeal", "item4": "Nexus Siege: Siege Weapon Slot", "item2": "Blasting Wand", "item5": "Maw of Malmortius", "trinket": "Greater Stealth Totem", "item3": "Nomads Medallion", "item1": "Rabadons Deathcap", "Champion": "Orianna"}, {"item4": "Infinity Edge", "Rank": 2, "item6": "Phantom Dancer", "item3": "Null-Magic Mantle", "item2": "Thornmail", "item5": "Eye of the Watchers", "trinket": "None", "item1": "Runaans Hurricane", "Champion": "Corki"}, {"trinket": "None", "item6": "Enchantment: Cinderhulk", "item4": "Seraphs Embrace", "item2": "Rabadons Deathcap", "item5": "Seraphs Embrace", "item3": "Sheen", "Rank": 3, "item1": "Muramana", "Champion": "Draven"}, {"trinket": "None", "item6": "Hunters Talisman", "item4": "Muramana", "item2": "Spirit Visage", "item5": "Dagger", "item3": "Enchantment: Bloodrazor", "Rank": 4, "item1": "Soul Anchor", "Champion": "Hecarim"}]
+,"TP":[{"Rank": 1, "item6": "Frozen Heart", "item4": "Eye of the Watchers", "item5": "Lost Chapter", "item2": "Jaurims Fist", "Champion": "Malzahar", "item3": "Zhonyas Hourglass", "item1": "Enchantment: Cinderhulk", "trinket": "None"}, {"Rank": 2, "item6": "Giants Belt", "item4": "Nashors Tooth", "item5": "Vanguard Banner", "item2": "Mikaels Crucible", "Champion": "Kayn", "item3": "Poro-Snax", "item1": "Hextech GLP-800", "trinket": "None"}]
+,"MP":[{"item6": "Control Ward", "item1": "Enchantment: Cinderhulk", "item2": "Void Staff", "item3": "Hextech Revolver", "Rank": 1, "trinket": "None", "item5": "Aether Wisp", "Champion": "KhaZix", "item4": "Spectres Cowl"}, {"item6": "Boots of Speed", "Champion": "DrMundo", "item2": "Mikaels Crucible", "item3": "Deaths Daughter", "Rank": 2, "trinket": "Greater Stealth Totem", "item5": "Morellonomicon", "item1": "Dervish Blade", "item4": "Knights Vow"}, {"item6": "Bilgewater Cutlass", "item1": "Rainbow Snax Party Pack!", "item2": "Chalice of Harmony", "item3": "Pickaxe", "Rank": 3, "trinket": "None", "item5": "Greater Vision Totem", "Champion": "Kayn", "item4": "Elixir of Sorcery"}]
+,"JP":[{"item6": "Health Potion", "item2": "Lich Bane", "item5": "Manamune", "item1": "Ninja Tabi", "Champion": "Master Yi", "Rank": 1, "item3": "Locket of the Iron Solari", "item4": "Pickaxe", "trinket": "None"}, {"item5": "Rejuvenation Bead", "item6": "Catalyst of Aeons", "item2": "Ruby Sightstone", "item1": "Mejais Soulstealer", "Champion": "Master Yi", "Rank": 2, "item3": "Cloak of Agility", "item4": "Guardians Horn", "trinket": "None"}, {"item6": "Mercurial Scimitar", "item2": "B. F. Sword", "item5": "Dorans Blade", "trinket": "None", "Champion": "Gnar", "Rank": 3, "item3": "Stalkers Blade", "item4": "Runaans Hurricane", "item1": "Chain Vest"}]
+,"BQ":[{"Champion": "Pantheon", "trinket": "Warding Totem", "item3": "The Black Cleaver", "item2": "Catalyst of Aeons", "item5": "Zeal", "Rank": 1, "item4": "Ravenous Hydra", "item6": "Frost Queens Claim", "item1": "The Bloodthirster"}, {"Champion": "Hecarim", "trinket": "Greater Vision Totem", "item3": "Ohmwrecker", "item2": "Nashors Tooth", "item5": "Mikaels Crucible", "Rank": 2, "item4": "Rod of Ages", "item6": "Wits End", "item1": "Muramana"}, {"Champion": "Poppy", "trinket": "Sweeping Lens", "item3": "Wicked Hatchet", "item2": "Infinity Edge", "item5": "Greater Stealth Totem", "Rank": 3, "item4": "The Black Cleaver", "item6": "Arcane Sweeper", "item1": "The Hex Core mk-2"}]
+,"TQ":[{"trinket": "None", "Champion": "Janna", "item6": "Guardian Angel", "item5": "Mejais Soulstealer", "item4": "Enchantment: Runic Echoes", "item1": "Skirmishers Sabre", "item2": "Raptor Cloak", "item3": "The Dark Seal", "Rank": 1}, {"Champion": "Twitch", "trinket": "None", "item6": "Steraks Gage", "item5": "Vanguard Banner", "item1": "Health Potion", "item4": "Eye of the Oasis", "item2": "Arcane Sweeper", "item3": "Vanguard Banner", "Rank": 2}, {"Champion": "KhaZix", "trinket": "None", "item2": "Essence Reaver", "item5": "Sunfire Cape", "item1": "Rod of Ages", "item4": "Flash Zone", "item6": "Ancient Coin", "item3": "Poachers Dirk", "Rank": 3}, {"Champion": "DrMundo", "trinket": "Farsight Alteration", "item6": "Locket of the Iron Solari", "item5": "Port Pad", "item1": "Dorans Blade", "item4": "Morellonomicon", "item2": "Trackers Knife", "item3": "Farsight Alteration", "Rank": 4}]
+,"MQ":[{"item3": "Nomads Medallion", "trinket": "None", "item6": "Mortal Reminder", "item4": "Siege Teleport Inactive", "Rank": 1, "item1": "Warmogs Armor", "Champion": "Ryze", "item2": "Hextech GLP-800", "item5": "Banner of Command"}, {"item3": "Haunting Guise", "trinket": "None", "item6": "Seekers Armguard", "item4": "Enchantment: Cinderhulk", "Rank": 2, "item1": "Trackers Knife", "Champion": "Lee Sin", "item2": "Flash Zone", "item5": "Deaths Daughter"}, {"item3": "Jaurims Fist", "trinket": "Sweeping Lens", "item6": "Null-Magic Mantle", "Champion": "Gnar", "Rank": 3, "item4": "Enchantment: Cinderhulk", "item1": "Enchantment: Runic Echoes", "item2": "Stalkers Blade", "item5": "Bilgewater Cutlass"}, {"item3": "Golden Transcendence Disabled", "trinket": "Sweeping Lens", "item6": "Mercurys Treads", "Champion": "Ahri", "Rank": 4, "item4": "Dead Mans Plate", "item1": "Kircheis Shard", "item2": "Steraks Gage", "item5": "Fiendish Codex"}]
+,"JQ":[{"item1": "Enchantment: Warrior", "item3": "Ardent Censer", "Champion": "Master Yi", "item4": "Trinity Force", "item6": "Wardens Mail", "item2": "Elixir of Wrath", "Rank": 1, "trinket": "Greater Vision Totem", "item5": "Rylais Crystal Scepter"}, {"item1": "Enchantment: Cinderhulk", "item2": "Deaths Dance", "Champion": "Kayle", "item4": "Enchantment: Runic Echoes", "item6": "Lich Bane", "item3": "Hunters Machete", "Rank": 2, "trinket": "None", "item5": "Tear of the Goddess"}, {"item1": "Void Staff", "item2": "Refillable Potion", "Champion": "Kayle", "item4": "Guardian Angel", "item6": "Ohmwrecker", "item3": "Guinsoos Rageblade", "Rank": 3, "trinket": "None", "item5": "Wardens Mail"}, {"item1": "B. F. Sword", "item3": "Bamis Cinder", "Champion": "Master Yi", "item4": "Hextech Gunblade", "item6": "Rejuvenation Bead", "item2": "Executioners Calling", "Rank": 4, "trinket": "Sweeping Lens", "item5": "Warmogs Armor"}]}
+
+cols = ['Rank', 'Champion', 'item1', 'item2', 'item3', 'item4', 'item5', 'item6', 'trinket']
+
+var pents = ["BP", "TP", "MP", "JP"];
+var quads = ["BQ", "TQ", "MQ", "JQ"];
+var quad = false;
+
+
+function update(lane) {
+  d3.select('table').remove();
+  document.getElementById("overlay").style.display = "block"
+
+  for (i = 0; i < quads.length; i++) {
+      console.log('hm')
+      if (lane === quads[i][0]) {
+        tabulate(dataset[quads[i]], cols, "Quadrakill Builds")
+      }
+  }
+
+
+    for (i = 0; i < pents.length; i++) {
+
+        if (lane === pents[i][0]) {
+          tabulate(dataset[pents[i]], cols, "Pentakill Builds")
+        }
+    }
+}
+
+
+function tabulate(data, columns, title) {
+
+var table = d3.select('body').append('table')
+table.attr("style", "margin-left: 13%")
+var caption = table.append("caption").text(title).style("color", '#ffcd00')
+                    .style("font-size", "40px").style("font-family","fantasy").style("text-shadow", '1.5px 1.5px #ff8300').style("text-align", "center");
+var thead = table.append('thead')
+var	tbody = table.append('tbody');
+
+// append the header row
+thead.append('tr')
+  .selectAll('th')
+  .data(columns).enter()
+  .append('th')
+    .text(function (column) { return column; });
+
+// create a row for each object in the data
+var rows = tbody.selectAll('tr')
+  .data(data)
+  .enter()
+  .append('tr');
+
+// create a cell in each row for each column
+var cells = rows.selectAll('td')
+  .data(function (row) {
+    return columns.map(function (column) {
+      return {column: column, value: row[column]};
+    });
+  })
+  .enter()
+  .append('td')
+    .text(function (d) { return d.value; });
+
+return table;
+}
+
+
+
+</script>
+</body>
+</html>
